@@ -15,6 +15,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PRODUCT_EVENTS } from './events/product-event.contants';
 import { ProductDeletedEvent } from './events/product-deleted.event';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ProductsService {
@@ -24,6 +25,7 @@ export class ProductsService {
     private readonly dataSource: DataSource,
     @InjectRepository(ProductEntity)
     private readonly productRepository: Repository<ProductEntity>,
+    private readonly user: UsersService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -88,10 +90,23 @@ export class ProductsService {
     });
   }
 
-  async create(dto: CreateProductDto): Promise<ProductDto> {
+  async create(dto: CreateProductDto, username: string): Promise<ProductDto> {
+    const user = await this.user.findByUsername(username);
+
+    const normalizeProductName = this.normalizeProductName(dto.NOME);
+
+    const existingProduct = await this.findByName(normalizeProductName);
+
+    if (existingProduct) {
+      throw new BadRequestException(
+        `Produto "${normalizeProductName}" já existe`,
+      );
+    }
+
     const product = this.productRepository.create({
       ...dto,
-      CRIADO_POR: 'system',
+      NOME: normalizeProductName,
+      CRIADO_POR: user.NOME_USUARIO,
     });
 
     const savedProduct = await this.productRepository.save(product);
@@ -128,7 +143,13 @@ export class ProductsService {
     return product;
   }
 
-  async update(id: number, dto: UpdateProductDto): Promise<ProductDto> {
+  async update(
+    id: number,
+    dto: UpdateProductDto,
+    username: string,
+  ): Promise<ProductDto> {
+    const user = await this.user.findByUsername(username);
+
     const product = await this.findActiveProductId(id);
 
     if (!dto.NOME) {
@@ -153,11 +174,12 @@ export class ProductsService {
     }
 
     product.NOME = normalizeProductName;
+    product.ATUALIZADO_POR = user.NOME_USUARIO;
 
     const updatedProduct = await this.productRepository.save(product);
 
     this.logger.log(
-      `Product ${id} updated from "${previousName}" to "${normalizeProductName}"`,
+      `Product ${id} updated from "${previousName}" to "${normalizeProductName}" by ${user.NOME_USUARIO}`,
     );
 
     return plainToInstance(ProductDto, updatedProduct, {
@@ -165,11 +187,15 @@ export class ProductsService {
     });
   }
 
-  async delete(id: number, req?: Request): Promise<void> {
+  async delete(id: number, username: string, req?: Request): Promise<void> {
+    const user = await this.user.findByUsername(username);
+
     const product = await this.findActiveProductId(id);
 
     await this.dataSource.transaction(async (manager) => {
       product.STATUS = BaseEntityStatusEnum.EXCLUIDO;
+      product.EXCLUIDO_POR = user.NOME_USUARIO;
+
       await manager.save(product);
     });
 
@@ -178,7 +204,9 @@ export class ProductsService {
       new ProductDeletedEvent(id, product.NOME, req),
     );
 
-    this.logger.log(`Product ${id} (${product.NOME}) deleted.`);
+    this.logger.log(
+      `Product ${id} (${product.NOME}) deleted by ${user.NOME_USUARIO}`,
+    );
   }
 
   async updateStock(id: number, quantity: number) {

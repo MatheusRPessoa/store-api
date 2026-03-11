@@ -7,7 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
@@ -20,12 +20,16 @@ import {
   SuccessResponseDto,
 } from './dto/products-response.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import type { AuthUser } from 'src/auth/types/auth-user.type';
 
 @ApiTags('Mercadorias')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({
     summary: 'Criar um produto',
@@ -41,8 +45,11 @@ export class ProductsController {
     description: 'Dados inválidos ao Produto',
     type: BadRequestResponseDto,
   })
-  async create(@Body() dto: CreateProductDto): Promise<ProductResponseDto> {
-    const product = await this.productsService.create(dto);
+  async create(
+    @Body() dto: CreateProductDto,
+    @CurrentUser() user: AuthUser,
+  ): Promise<ProductResponseDto> {
+    const product = await this.productsService.create(dto, user.username);
     return {
       succeeded: true,
       data: product,
@@ -50,6 +57,7 @@ export class ProductsController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({
     summary: 'Listar todos os produtos.',
@@ -68,6 +76,7 @@ export class ProductsController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiOperation({
     summary: 'Buscar produto por ID',
@@ -102,6 +111,7 @@ export class ProductsController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @ApiOperation({
     summary: 'Atualizar produto',
@@ -117,9 +127,9 @@ export class ProductsController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateProductDto,
-    @Req() req: Request,
+    @CurrentUser() user: AuthUser,
   ): Promise<ProductResponseDto> {
-    const product = await this.productsService.update(id, dto, req);
+    const product = await this.productsService.update(id, dto, user.username);
     return {
       succeeded: true,
       data: product,
@@ -127,6 +137,7 @@ export class ProductsController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @ApiOperation({
     summary: 'Excluir produto.',
@@ -156,9 +167,9 @@ export class ProductsController {
   })
   async delete(
     @Param('id', ParseIntPipe) id: number,
-    @Req() req: Request,
+    @CurrentUser() user: AuthUser,
   ): Promise<SuccessResponseDto> {
-    await this.productsService.delete(id, req);
+    await this.productsService.delete(id, user.username);
     return {
       succeeded: true,
       message: 'Produto excluido com sucesso',
