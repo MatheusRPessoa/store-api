@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { Expose, Transform } from "class-transformer";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Expose, Transform } from 'class-transformer';
 
 const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo',
@@ -22,56 +22,56 @@ export const formatDate = (
 };
 
 export class ProductDto {
-    @Expose()
-    @ApiProperty({
-      description: 'Identificador único do registro',
-      type: Number,
-    })
-    ID: number;
+  @Expose()
+  @ApiProperty({
+    description: 'Identificador único do registro',
+    type: Number,
+  })
+  ID: number;
 
-    @Expose()
-    @ApiProperty({
-      description: 'Usuário responsável pela criação',
-      type: String,
-    })
-    CRIADO_POR: string;
+  @Expose()
+  @ApiProperty({
+    description: 'Usuário responsável pela criação',
+    type: String,
+  })
+  CRIADO_POR: string;
 
-    @ApiProperty({
-      description: 'Data de criação do registro',
-      type: String,
-      example: '17/12/2025, 10:30:45',
-    })
-    @Transform(({ value }: { value: Date | string | null }) => formatDate(value))
-    @Expose()
-    CRIADO_EM: Date | string;
+  @ApiProperty({
+    description: 'Data de criação do registro',
+    type: String,
+    example: '17/12/2025, 10:30:45',
+  })
+  @Transform(({ value }: { value: Date | string | null }) => formatDate(value))
+  @Expose()
+  CRIADO_EM: Date | string;
 
-    @Expose()
-    @ApiProperty({
-      description: 'Nome do produto.',
-      example: 'Café Santa Clara 250g',
-    })
-    NOME: string;
+  @Expose()
+  @ApiProperty({
+    description: 'Nome do produto.',
+    example: 'Café Santa Clara 250g',
+  })
+  NOME: string;
 
-    @Expose()
-    @ApiProperty({
-      description: 'Descrição detalhada do produto.',
-      example: 'Café torrado e moído de sabor intenso.', 
-    })
-    DESCRICAO: string;
+  @Expose()
+  @ApiProperty({
+    description: 'Descrição detalhada do produto.',
+    example: 'Café torrado e moído de sabor intenso.',
+  })
+  DESCRICAO: string;
 
-    @Expose()
-    @ApiProperty({
-      description: 'Preço do produto.',
-      example: 149.90
-    })
-    PRECO: number;
+  @Expose()
+  @ApiProperty({
+    description: 'Preço do produto.',
+    example: 149.9,
+  })
+  PRECO: number;
 
-    @Expose()
-    @ApiProperty({
-      description: 'Quantidade do produto em estoque.',
-      example: 20,
-    })
-    QUANTIDADE: number
+  @Expose()
+  @ApiProperty({
+    description: 'Quantidade do produto em estoque.',
+    example: 20,
+  })
+  QUANTIDADE: number;
 }
 
 export class ProductResponseDto {
@@ -103,16 +103,16 @@ export class ProductListResponseDto {
 }
 
 export class SuccessResponseDto {
-    @ApiProperty({
-        description: 'indica sucesso da operação',
-        example: true
-    })
-    succeeded: boolean;
+  @ApiProperty({
+    description: 'indica sucesso da operação',
+    example: true,
+  })
+  succeeded: boolean;
 
-    @ApiProperty({
-        description: 'Mensagem informativa'
-    })
-    message: string;
+  @ApiProperty({
+    description: 'Mensagem informativa',
+  })
+  message: string;
 }
 
 export class ErrorDetailsDto {
@@ -162,6 +162,38 @@ export class BadRequestResponseDto {
       message: 'Validation failed (numeric string is expected)',
       error: 'Bad Request',
       statusCode: 400,
+    },
+  })
+  error: ErrorDetailsDto;
+}
+
+export class NotFoundResponseDto {
+  @ApiProperty({
+    description: 'Indica se a operação foi bem sucedida',
+    example: false,
+  })
+  succeeded: boolean;
+
+  @ApiProperty({
+    description: 'Dados retornados (sempre null em caso de erro)',
+    example: null,
+    nullable: true,
+    required: false,
+  })
+  data: unknown;
+
+  @ApiProperty({
+    description: 'Mensagem de erro',
+    example: 'Recurso não encontrado.',
+  })
+  message: string;
+
+  @ApiProperty({
+    description: 'Detalhes do erro',
+    example: {
+      message: 'Recurso não encontrado.',
+      error: 'Not Found',
+      statusCode: 404,
     },
   })
   error: ErrorDetailsDto;
