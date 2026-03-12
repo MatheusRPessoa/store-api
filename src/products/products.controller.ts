@@ -13,16 +13,19 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import {
-  BadRequestResponseDto,
-  NotFoundResponseDto,
   ProductListResponseDto,
   ProductResponseDto,
   SuccessResponseDto,
 } from './dto/products-response.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
-import type { AuthUser } from 'src/auth/types/auth-user.type';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import type { AuthUser } from '../auth/types/auth-user.type';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import {
+  BadRequestResponseDto,
+  NotFoundResponseDto,
+  UnauthorizedResponseDto,
+} from '../common/dto/pagination/error-response.dto';
 
 @ApiTags('Mercadorias')
 @Controller('products')
@@ -44,6 +47,11 @@ export class ProductsController {
     status: 400,
     description: 'Dados inválidos ao Produto',
     type: BadRequestResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token de sessão não encontrado ou sessão inválida/expirada',
+    type: UnauthorizedResponseDto,
   })
   async create(
     @Body() dto: CreateProductDto,

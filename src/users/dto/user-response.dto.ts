@@ -42,6 +42,7 @@ export class UserDto {
     type: String,
   })
   CRIADO_POR: string;
+  um;
 }
 
 export class UserResponseDto {
@@ -70,101 +71,4 @@ export class UserListResponseDto {
 
   @ApiPropertyOptional({ description: 'Mensagem opcional' })
   message?: string;
-}
-
-export class SuccessResponseDto {
-  @ApiProperty({
-    description: 'Indica sucesso da operação',
-    example: true,
-  })
-  succeeded: boolean;
-
-  @ApiProperty({
-    description: 'Mensagem informativa',
-  })
-  message: string;
-}
-
-export class ErrorDetailsDto {
-  @ApiProperty({
-    description: 'Mensagem de erro',
-    example: 'Validation failed (numeric string is expected)',
-  })
-  message: string;
-
-  @ApiProperty({
-    description: 'Tipo de erro',
-    example: 'Bad Request',
-  })
-  error: string;
-
-  @ApiProperty({
-    description: 'Código de status HTTP',
-    example: 400,
-  })
-  statusCode: number;
-}
-
-export class BadRequestResponseDto {
-  @ApiProperty({
-    description: 'Indica se a operação foi bem sucedida',
-    example: false,
-  })
-  succeeded: boolean;
-
-  @ApiProperty({
-    description: 'Dados retornados (sempre null em caso de erro)',
-    example: null,
-    nullable: true,
-    required: false,
-  })
-  data: unknown;
-
-  @ApiProperty({
-    description: 'Mensagem de erro',
-    example: 'Validation failed (numeric string is expected)',
-  })
-  message: string;
-
-  @ApiProperty({
-    description: 'Detalhes do erro',
-    example: {
-      message: 'Validation failed (numeric string is expected)',
-      error: 'Bad Request',
-      statusCode: 400,
-    },
-  })
-  error: ErrorDetailsDto;
-}
-
-export class NotFoundResponseDto {
-  @ApiProperty({
-    description: 'Indica se a operação foi bem sucedida',
-    example: false,
-  })
-  succeeded: boolean;
-
-  @ApiProperty({
-    description: 'Dados retornados (sempre null em caso de erro)',
-    example: null,
-    nullable: true,
-    required: false,
-  })
-  data: unknown;
-
-  @ApiProperty({
-    description: 'Mensagem de erro',
-    example: 'Recurso não encontrado.',
-  })
-  message: string;
-
-  @ApiProperty({
-    description: 'Detalhes do erro',
-    example: {
-      message: 'Recurso não encontrado.',
-      error: 'Not Found',
-      statusCode: 404,
-    },
-  })
-  error: ErrorDetailsDto;
 }

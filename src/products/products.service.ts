@@ -10,12 +10,13 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { plainToInstance } from 'class-transformer';
 import { ProductDto } from './dto/products-response.dto';
-import { BaseEntityStatusEnum } from 'src/config/database/entities/enums/base-entity-status.enum';
+import { BaseEntityStatusEnum } from '../config/database/entities/enums/base-entity-status.enum';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PRODUCT_EVENTS } from './events/product-event.contants';
 import { ProductDeletedEvent } from './events/product-deleted.event';
 import { UsersService } from 'src/users/users.service';
+import { ProductCreatedEvent } from './events/product-created.event';
 
 @Injectable()
 export class ProductsService {
@@ -110,6 +111,13 @@ export class ProductsService {
     });
 
     const savedProduct = await this.productRepository.save(product);
+
+    this.eventEmitter.emit(
+      PRODUCT_EVENTS.CREATED,
+      new ProductCreatedEvent(savedProduct.ID, savedProduct.NOME),
+    );
+
+    this.logger.log(`User ${savedProduct.ID} (${savedProduct.NOME}) created`);
 
     return plainToInstance(ProductDto, savedProduct, {
       excludeExtraneousValues: true,

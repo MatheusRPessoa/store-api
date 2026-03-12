@@ -1,5 +1,10 @@
-import { BaseEntityStatusEnum } from 'src/config/database/entities/enums/base-entity-status.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntityStatusEnum } from '../../config/database/entities/enums/base-entity-status.enum';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('USUARIOS')
 export class UserEntity {
@@ -34,4 +39,23 @@ export class UserEntity {
     default: BaseEntityStatusEnum.ATIVO,
   })
   STATUS: BaseEntityStatusEnum;
+
+  @Column({
+    name: 'ATUALIZADO_POR',
+    type: 'text',
+    length: 20,
+    nullable: true,
+  })
+  ATUALIZADO_POR: string | null;
+
+  @Column({
+    name: 'EXCLUIDO_POR',
+    type: 'text',
+    length: 20,
+    nullable: true,
+  })
+  EXCLUIDO_POR: string | null;
+
+  @CreateDateColumn()
+  CRIADO_EM: Date;
 }

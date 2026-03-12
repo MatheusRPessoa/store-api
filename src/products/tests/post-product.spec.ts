@@ -1,9 +1,17 @@
-import { AuthHelper } from '../../tests/helpers/auth.helper';
-import { createProduct } from './helpers/product.helper';
+import { AuthHelper } from '../../auth/tests/helpers/auth.helper';
+import {
+  cleanupAll,
+  createProduct,
+  initTestDataSource,
+} from './helpers/product.helper';
 import { ProductResponseDto } from '../dto/products-response.dto';
+import { AppDataSource } from '../../config/database/data-source';
 
 describe('POST /products', () => {
   beforeAll(async () => {
+    await AppDataSource.initialize();
+    initTestDataSource(AppDataSource);
+    await cleanupAll();
     await AuthHelper.authenticate();
   });
 

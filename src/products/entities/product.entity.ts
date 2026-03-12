@@ -1,4 +1,4 @@
-import { BaseEntityStatusEnum } from 'src/config/database/entities/enums/base-entity-status.enum';
+import { BaseEntityStatusEnum } from '../../config/database/entities/enums/base-entity-status.enum';
 import {
   Column,
   CreateDateColumn,

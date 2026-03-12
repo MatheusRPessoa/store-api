@@ -1,4 +1,7 @@
 import fetch from 'node-fetch';
+import { UserEntity } from '../../../users/entities/user.entity';
+import { DataSource } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 interface AuthResponse {
   access_token: string;
@@ -7,12 +10,29 @@ interface AuthResponse {
 export class AuthHelper {
   private static accessToken: string;
 
+  static async setup(dataSource: DataSource) {
+    const repo = dataSource.getRepository(UserEntity);
+
+    const exists = await repo.findOne({ where: { NOME_USUARIO: 'admin' } });
+
+    if (!exists) {
+      const user = repo.create({
+        NOME_USUARIO: 'admin',
+        SENHA: await bcrypt.hash('admin123', 10),
+        EMAIL: 'admin@admin.com.br',
+      });
+      await repo.save(user);
+    }
+
+    await this.authenticate();
+  }
+
   static async authenticate() {
     const response = await fetch('http://localhost:3000/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        username: 'admin', // igual ao que o AuthService espera
+        username: 'admin',
         password: 'admin123',
       }),
     });
