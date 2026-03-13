@@ -17,6 +17,7 @@ import {
   UnauthorizedResponseDto,
 } from '../common/dto/pagination/error-response.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { ParseUsernamePipe } from 'src/common/pipes/parse-username.pipe';
 
 @ApiTags('Usuarios')
 @Controller('users')
@@ -157,7 +158,7 @@ export class UsersController {
     type: UnauthorizedResponseDto,
   })
   async findByUsername(
-    @Param('username') username: string,
+    @Param('username', ParseUsernamePipe) username: string,
   ): Promise<UserResponseDto> {
     const user = await this.userService.findByUsername(username);
     return {

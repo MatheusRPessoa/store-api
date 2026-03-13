@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ProductEntity } from './entities/product.entity';
-import { DataSource, Not, Repository } from 'typeorm';
+import { DataSource, ILike, Not, Repository } from 'typeorm';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { plainToInstance } from 'class-transformer';
@@ -78,17 +78,25 @@ export class ProductsService {
     return product;
   }
 
-  private async findByName(
-    name: string,
-    excludeId?: number,
-  ): Promise<ProductEntity | null> {
-    return this.productRepository.findOne({
+  async findByName(name: string, excludeId?: number): Promise<ProductDto[]> {
+    const products = await this.productRepository.find({
       where: {
-        NOME: name,
+        NOME: ILike(`%${name}`),
         STATUS: Not(BaseEntityStatusEnum.EXCLUIDO),
         ...(excludeId && { ID: Not(excludeId) }),
       },
+      order: { NOME: 'ASC' },
     });
+
+    if (!products.length) {
+      throw new NotFoundException(`Produto "${name}" não encontrado`);
+    }
+
+    return products.map((product) =>
+      plainToInstance(ProductDto, product, {
+        excludeExtraneousValues: true,
+      }),
+    );
   }
 
   async create(dto: CreateProductDto, username: string): Promise<ProductDto> {

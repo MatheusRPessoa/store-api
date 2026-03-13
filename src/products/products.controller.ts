@@ -7,9 +7,16 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import {
@@ -26,6 +33,7 @@ import {
   NotFoundResponseDto,
   UnauthorizedResponseDto,
 } from '../common/dto/pagination/error-response.dto';
+import { SearchProductByNameDto } from './dto/search-product-by-name.dto';
 
 @ApiTags('Mercadorias')
 @Controller('products')
@@ -116,6 +124,40 @@ export class ProductsController {
       succeeded: true,
       data: product,
       message: 'Produto encontrado com sucesso',
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('search/by-name')
+  @ApiOperation({
+    summary: 'Buscar produto por nome',
+    description: 'Endpoint responsável por retornar produtos pelo nome',
+  })
+  @ApiQuery({
+    name: 'name',
+    description: 'Nome do produto',
+    type: 'string',
+    required: true,
+    example: 'Produto A',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Produtos encontrados com sucesso',
+    type: ProductListResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'O parâmetro informado não é válido',
+    type: BadRequestResponseDto,
+  })
+  async findByName(
+    @Query() query: SearchProductByNameDto,
+  ): Promise<ProductListResponseDto> {
+    const products = await this.productsService.findByName(query.name);
+    return {
+      succeeded: true,
+      data: products,
+      message: 'Produtos encontrados com sucesso',
     };
   }
 

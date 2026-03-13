@@ -5,14 +5,6 @@ import {
   initTestDataSource,
 } from './helpers/user.helper';
 import { AuthHelper } from '../../auth/tests/helpers/auth.helper';
-import { ApiResponse } from '../../tests/helpers/api-response.helper';
-
-interface UserData {
-  ID: number;
-  NOME_USUARIO: string;
-  STATUS: string;
-  CRIADO_EM: Date | null;
-}
 
 describe('POST /users', () => {
   beforeAll(async () => {
@@ -55,22 +47,17 @@ describe('POST /users', () => {
     });
 
     it('should return 401 when user not authenticated', async () => {
-      const response = await fetch(`http://localhost:3000/users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await createUser(
+        {
           username: 'test',
           password: '123456',
           email: 'test@test.com',
-        }),
-      });
-
-      const body = (await response.json()) as ApiResponse<UserData>;
+        },
+        false,
+      );
 
       expect(response.status).toBe(401);
-      expect(body.succeeded).toBe(false);
+      expect(response.body.succeeded).toBe(false);
     });
   });
 });

@@ -5,7 +5,7 @@ export class CreateProductDto {
   @ApiProperty({
     description: 'Nome do produto.',
     example: 'Café Santa Clara 250g',
-    minLength: 1,
+    minLength: 3,
     maxLength: 255,
   })
   @IsString({ message: 'O nome do produto deve ser do tipo texto.' })

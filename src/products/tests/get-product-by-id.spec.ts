@@ -1,25 +1,32 @@
 import { AppDataSource } from '../../config/database/data-source';
 import {
   cleanupAll,
-  createUser,
-  getUserById,
+  createProduct,
+  getProductById,
   initTestDataSource,
-} from './helpers/user.helper';
+} from './helpers/product.helper';
 import { AuthHelper } from '../../auth/tests/helpers/auth.helper';
-import { ApiResponse } from '../../tests/helpers/api-response.helper';
+import { ApiResponse } from 'src/tests/helpers/api-response.helper';
 
-interface UserData {
+interface ProductData {
   ID: number;
-  NOME_USUARIO: string;
+  NOME: string;
+  DESCRICAO: string;
+  PRECO: number;
+  QUANTIDADE: number;
   STATUS: string;
   CRIADO_EM: Date | null;
 }
 
-describe('GET /users/:id', () => {
+describe('GET /products/:id', () => {
   beforeAll(async () => {
     await AppDataSource.initialize();
     initTestDataSource(AppDataSource);
     await AuthHelper.setup(AppDataSource);
+  });
+
+  beforeEach(async () => {
+    await cleanupAll();
   });
 
   afterAll(async () => {
@@ -27,9 +34,9 @@ describe('GET /users/:id', () => {
   });
 
   it('should return a user by id', async () => {
-    const created = await createUser();
+    const created = await createProduct();
 
-    const response = await getUserById(created.body.data!.ID);
+    const response = await getProductById(created.body.data!.ID);
 
     expect(response.status).toBe(200);
     expect(response.body.succeeded).toBe(true);
@@ -37,21 +44,21 @@ describe('GET /users/:id', () => {
   });
 
   it('should return 404 when user does not exist', async () => {
-    const response = await getUserById(999999);
+    const response = await getProductById(999999);
 
     expect(response.status).toBe(404);
     expect(response.body.succeeded).toBe(false);
   });
 
   it('should return 401 when user not authenticated', async () => {
-    const response = await getUserById(1, false);
+    const response = await getProductById(1, false);
 
     expect(response.status).toBe(401);
     expect(response.body.succeeded).toBe(false);
   });
 
   it('should return 400 when id is not a number', async () => {
-    const response = await fetch(`http://localhost:3000/users/abc`, {
+    const response = await fetch(`http://localhost:3000/products/abc`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -59,7 +66,7 @@ describe('GET /users/:id', () => {
       },
     });
 
-    const body = (await response.json()) as ApiResponse<UserData>;
+    const body = (await response.json()) as ApiResponse<ProductData>;
 
     expect(response.status).toBe(400);
     expect(body.succeeded).toBe(false);

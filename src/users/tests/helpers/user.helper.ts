@@ -1,10 +1,10 @@
 import { AuthHelper } from '../../../auth/tests/helpers/auth.helper';
-import { UserResponseDto } from '../../../users/dto/user-response.dto';
 import { UserEntity } from '../../../users/entities/user.entity';
 import { DataSource } from 'typeorm';
 import { ApiResponse } from 'src/tests/helpers/api-response.helper';
 
 const USERS_ENDPOINT = '/users';
+const BASE_URL = 'http://localhost:3000';
 
 let dataSource: DataSource;
 
@@ -25,24 +25,24 @@ export async function createUser(
     password: string;
     email: string;
   }>,
-) {
+  authenticated = true,
+): Promise<{ status: number; ok: boolean; body: ApiResponse<UserData> }> {
   const payload = {
     username: overrides?.username ?? 'user-test',
     password: overrides?.password ?? 'admin123',
     email: overrides?.email ?? 'test@email.com.br',
   };
 
-  const response = await fetch(`http://localhost:3000${USERS_ENDPOINT}`, {
+  const response = await fetch(`${BASE_URL}${USERS_ENDPOINT}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...AuthHelper.getAuthHeader(),
+      ...(authenticated ? AuthHelper.getAuthHeader() : {}),
     },
     body: JSON.stringify(payload),
   });
 
   const data = (await response.json()) as ApiResponse<UserData>;
-  console.log('Resposta dp endpoint: ', data);
 
   return {
     status: response.status,
@@ -52,7 +52,7 @@ export async function createUser(
 }
 
 export async function getAllUsers() {
-  const response = await fetch(`http://localhost:3000${USERS_ENDPOINT}`, {
+  const response = await fetch(`${BASE_URL}${USERS_ENDPOINT}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -69,46 +69,54 @@ export async function getAllUsers() {
   };
 }
 
-export async function getUserById(id: number) {
-  const response = await fetch(`http://localhost:3000/users/${id}`, {
+export async function getUserById(
+  id: number,
+  authenticated = true,
+): Promise<{ status: number; ok: boolean; body: ApiResponse<UserData> }> {
+  const response = await fetch(`${BASE_URL}${USERS_ENDPOINT}/${id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      ...AuthHelper.getAuthHeader(),
+      ...(authenticated ? AuthHelper.getAuthHeader() : {}),
     },
   });
 
-  const body = (await response.json()) as ApiResponse<UserData>;
+  const data = (await response.json()) as ApiResponse<UserData>;
 
   return {
     status: response.status,
     ok: response.ok,
-    body,
+    body: data,
   };
 }
 
 export async function getUserByUsername(
   username: string,
-): Promise<UserResponseDto> {
+  authenticated = true,
+): Promise<{ status: number; ok: boolean; body: ApiResponse<UserData> }> {
   const response = await fetch(
-    `http://localhost:3000${USERS_ENDPOINT}/username/${username}`,
+    `${BASE_URL}${USERS_ENDPOINT}/username/${username}`,
     {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        ...AuthHelper.getAuthHeader(),
+        ...(authenticated ? AuthHelper.getAuthHeader() : {}),
       },
     },
   );
 
-  const data = (await response.json()) as UserResponseDto;
+  const data = (await response.json()) as ApiResponse<UserData>;
   console.log('Resposta do endpoint: ', data);
 
-  return data;
+  return {
+    status: response.status,
+    ok: response.ok,
+    body: data,
+  };
 }
 
 export async function deleteUser(id: number): Promise<void> {
-  await fetch(`http://localhost:3000${USERS_ENDPOINT}/${id}`, {
+  await fetch(`${BASE_URL}${USERS_ENDPOINT}/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
