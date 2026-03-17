@@ -104,7 +104,12 @@ export class ProductsService {
 
     const normalizeProductName = this.normalizeProductName(dto.NOME);
 
-    const existingProduct = await this.findByName(normalizeProductName);
+    const existingProduct = await this.productRepository.findOne({
+      where: {
+        NOME: normalizeProductName,
+        STATUS: Not(BaseEntityStatusEnum.EXCLUIDO),
+      },
+    });
 
     if (existingProduct) {
       throw new BadRequestException(
@@ -124,8 +129,6 @@ export class ProductsService {
       PRODUCT_EVENTS.CREATED,
       new ProductCreatedEvent(savedProduct.ID, savedProduct.NOME),
     );
-
-    this.logger.log(`User ${savedProduct.ID} (${savedProduct.NOME}) created`);
 
     return plainToInstance(ProductDto, savedProduct, {
       excludeExtraneousValues: true,
