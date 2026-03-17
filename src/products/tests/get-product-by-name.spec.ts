@@ -18,6 +18,10 @@ describe('GET /products/name/:name', () => {
     await cleanupAll();
   });
 
+  beforeEach(async () => {
+    await cleanupAll();
+  });
+
   it('should return a product by name', async () => {
     const name = 'product-name-test';
 

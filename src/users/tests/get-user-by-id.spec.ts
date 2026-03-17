@@ -26,6 +26,10 @@ describe('GET /users/:id', () => {
     await cleanupAll();
   });
 
+  beforeEach(async () => {
+    await cleanupAll();
+  });
+
   it('should return a user by id', async () => {
     const created = await createUser();
 

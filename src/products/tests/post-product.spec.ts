@@ -44,5 +44,23 @@ describe('POST /products', () => {
       expect(response.body.succeeded).toBe(false);
       expect(response.body.message).toContain('Unauthorized');
     });
+
+    it('should return 400 when name is not provided', async () => {
+      const response = await createProduct({
+        NOME: undefined,
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.succeeded).toBe(false);
+    });
+
+    it('should return 400 when name is empry', async () => {
+      const response = await createProduct({
+        NOME: '',
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.succeeded).toBe(false);
+    });
   });
 });

@@ -18,6 +18,10 @@ describe('GET /users/username/:username', () => {
     await cleanupAll();
   });
 
+  beforeEach(async () => {
+    await cleanupAll();
+  });
+
   it('should return a user by username', async () => {
     const username = 'user-username-test';
 

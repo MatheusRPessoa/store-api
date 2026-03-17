@@ -14,7 +14,6 @@ interface ProductData {
   DESCRICAO: string;
   PRECO: number;
   QUANTIDADE: number;
-  STATUS: string;
   CRIADO_EM: Date | null;
 }
 
