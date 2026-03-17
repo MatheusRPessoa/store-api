@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { UserEntity } from '../../../users/entities/user.entity';
+import { UserEntity } from '../../../modules/users/entities/user.entity';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
