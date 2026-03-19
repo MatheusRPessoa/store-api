@@ -1,16 +1,15 @@
 import { AppDataSource } from '../../../config/database/data-source';
-import { ProductDto } from '../../products/dto/products-response.dto';
 import {
   cleanupAll,
   createOrder,
   initTestDataSource,
 } from './helpers/order.helper';
 import { AuthHelper } from '../../../auth/tests/helpers/auth.helper';
-import { createProduct } from '../../products/tests/helpers/product.helper';
 import { NotFoundException } from '@nestjs/common';
+import { ProductFactory } from '../../../modules/products/tests/helpers/product-factory.helper';
 
 describe('POST /orders', () => {
-  let product: ProductDto;
+  let productId: number;
 
   beforeAll(async () => {
     await AppDataSource.initialize();
@@ -21,20 +20,20 @@ describe('POST /orders', () => {
   beforeEach(async () => {
     await cleanupAll();
 
-    const productResponse = await createProduct();
+    const product = await ProductFactory.create();
 
-    if (!productResponse.body.data) {
+    if (!product) {
       throw new NotFoundException('Product not created in test setup');
     }
 
-    product = productResponse.body.data as ProductDto;
+    productId = product.ID;
   });
 
   describe('Success', () => {
     it('Should return 201 when creating an order with valid data', async () => {
       const response = await createOrder([
         {
-          ID_PRODUTO: product.ID,
+          ID_PRODUTO: productId,
           QUANTIDADE: 1,
         },
       ]);
@@ -72,7 +71,7 @@ describe('POST /orders', () => {
     it('should return 400 when insufficient stock', async () => {
       const response = await createOrder([
         {
-          ID_PRODUTO: product.ID,
+          ID_PRODUTO: productId,
           QUANTIDADE: 99999,
         },
       ]);
@@ -86,7 +85,7 @@ describe('POST /orders', () => {
       const response = await createOrder(
         [
           {
-            ID_PRODUTO: product.ID,
+            ID_PRODUTO: productId,
             QUANTIDADE: 1,
           },
         ],
