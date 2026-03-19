@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { OrderItemEntity } from './order-item.entity';
 
-@Entity('orders')
+@Entity('PEDIDOS')
 export class OrderEntity {
   @PrimaryGeneratedColumn()
   ID: number;
@@ -32,19 +32,19 @@ export class OrderEntity {
 
   @Column({
     name: 'CRIADO_POR',
-    type: 'text',
+    type: 'varchar',
     length: 20,
   })
   CRIADO_POR: string;
 
   @CreateDateColumn({
-    type: 'datetime',
+    type: 'timestamp',
   })
   CRIADO_EM: Date;
 
   @Column({
     name: 'STATUS',
-    type: 'text',
+    type: 'varchar',
     enum: BaseEntityStatusEnum,
     default: BaseEntityStatusEnum.ATIVO,
   })
@@ -52,7 +52,7 @@ export class OrderEntity {
 
   @Column({
     name: 'ATUALIZADO_POR',
-    type: 'text',
+    type: 'varchar',
     length: 20,
     nullable: true,
   })
@@ -60,7 +60,7 @@ export class OrderEntity {
 
   @Column({
     name: 'EXCLUIDO_POR',
-    type: 'text',
+    type: 'varchar',
     length: 20,
     nullable: true,
   })
