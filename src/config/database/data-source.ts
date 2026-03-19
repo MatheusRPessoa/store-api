@@ -1,17 +1,20 @@
-// src/config/database/data-source.ts
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { ProductEntity } from '../../modules/products/entities/product.entity';
-import { UserEntity } from '../../modules/users/entities/user.entity';
-import { OrderEntity } from '../../modules/orders/entities/order.entity';
-import { OrderItemEntity } from '../../modules/orders/entities/order-item.entity';
+import * as dotenv from 'dotenv';
+
+const envFile =
+  process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
+
+dotenv.config({ path: envFile });
 
 export const AppDataSource = new DataSource({
-  type: 'sqlite',
-  database: 'database.sqlite',
-  synchronize: true,
-  logging: false,
-  entities: [UserEntity, ProductEntity, OrderEntity, OrderItemEntity],
-  migrations: [],
-  subscribers: [],
+  type: 'postgres',
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  entities: [__dirname + '/../../**/*.entity.{ts,js}'],
+  migrations: [__dirname + '/../../migrations/*.{ts,js}'],
+  synchronize: false,
 });
