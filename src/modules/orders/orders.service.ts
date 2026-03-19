@@ -52,6 +52,19 @@ export class OrdersService {
     return order;
   }
 
+  private async findOrderById(id: number): Promise<OrderEntity> {
+    const order = await this.orderRepository.findOne({
+      where: { ID: id },
+      relations: ['ITEMS'],
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Pedido com ID ${id} não encontrado`);
+    }
+
+    return order;
+  }
+
   async create(dto: CreateOrderDto, username: string): Promise<OrderDto> {
     const user = await this.userService.findByUsername(username);
 
@@ -146,7 +159,7 @@ export class OrdersService {
   async cancel(id: number, username: string): Promise<void> {
     const user = await this.userService.findByUsername(username);
 
-    const order = await this.findActiveOrderById(id);
+    const order = await this.findOrderById(id);
 
     if (order.STATUS === BaseEntityStatusEnum.EXCLUIDO) {
       throw new BadRequestException('Pedido já está cancelado');
