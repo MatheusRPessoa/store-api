@@ -13,28 +13,28 @@ export class UserEntity {
 
   @Column({
     name: 'NOME_USUARIO',
-    type: 'text',
+    type: 'varchar',
     length: 255,
   })
   NOME_USUARIO: string;
 
   @Column({
     name: 'EMAIL',
-    type: 'text',
+    type: 'varchar',
     length: 255,
   })
   EMAIL: string;
 
   @Column({
     name: 'SENHA',
-    type: 'text',
+    type: 'varchar',
     length: 255,
   })
   SENHA: string;
 
   @Column({
     name: 'STATUS',
-    type: 'text',
+    type: 'varchar',
     length: 20,
     default: BaseEntityStatusEnum.ATIVO,
   })
@@ -42,7 +42,7 @@ export class UserEntity {
 
   @Column({
     name: 'ATUALIZADO_POR',
-    type: 'text',
+    type: 'varchar',
     length: 20,
     nullable: true,
   })
@@ -50,12 +50,14 @@ export class UserEntity {
 
   @Column({
     name: 'EXCLUIDO_POR',
-    type: 'text',
+    type: 'varchar',
     length: 20,
     nullable: true,
   })
   EXCLUIDO_POR: string | null;
 
-  @CreateDateColumn()
+  @CreateDateColumn({
+    type: 'timestamp',
+  })
   CRIADO_EM: Date;
 }

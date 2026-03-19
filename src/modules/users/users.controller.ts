@@ -24,7 +24,6 @@ import { ParseUsernamePipe } from 'src/common/pipes/parse-username.pipe';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({
     summary: 'Criar usuário',
