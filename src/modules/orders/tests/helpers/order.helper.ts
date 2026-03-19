@@ -10,18 +10,19 @@ const BASE_URL = 'http://localhost:3000';
 
 let dataSource: DataSource;
 
-interface OrderItemData {
+export interface OrderItemData {
   ID: number;
   ID_PRODUTO: number;
   QUANTIDADE: number;
   PRECO: number;
 }
 
-interface OrderData {
+export interface OrderData {
   ID: number;
   TOTAL: number;
   ITEMS: OrderItemData[];
   CRIADO_EM: Date | null;
+  CRIADO_POR: string;
 }
 
 export function initTestDataSource(ds: DataSource) {
