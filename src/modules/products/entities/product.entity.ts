@@ -13,45 +13,47 @@ export class ProductEntity {
 
   @Column({
     name: 'NOME',
-    type: 'text',
+    type: 'varchar',
     length: 255,
   })
   NOME: string;
 
   @Column({
     name: 'DESCRICAO',
-    type: 'text',
+    type: 'varchar',
     length: 255,
   })
   DESCRICAO: string;
 
   @Column({
     name: 'PRECO',
-    type: Number,
+    type: 'numeric',
+    precision: 10,
+    scale: 2,
   })
   PRECO: number;
 
   @Column({
     name: 'QUANTIDADE',
-    type: Number,
+    type: 'int',
   })
   QUANTIDADE: number;
 
   @Column({
     name: 'CRIADO_POR',
-    type: 'text',
+    type: 'varchar',
     length: 20,
   })
   CRIADO_POR: string;
 
   @CreateDateColumn({
-    type: 'datetime',
+    type: 'timestamp',
   })
   CRIADO_EM: Date;
 
   @Column({
     name: 'STATUS',
-    type: 'text',
+    type: 'varchar',
     length: 20,
     default: BaseEntityStatusEnum.ATIVO,
   })
@@ -59,7 +61,7 @@ export class ProductEntity {
 
   @Column({
     name: 'ATUALIZADO_POR',
-    type: 'text',
+    type: 'varchar',
     length: 20,
     nullable: true,
   })
@@ -67,7 +69,7 @@ export class ProductEntity {
 
   @Column({
     name: 'EXCLUIDO_POR',
-    type: 'text',
+    type: 'varchar',
     length: 20,
     nullable: true,
   })
