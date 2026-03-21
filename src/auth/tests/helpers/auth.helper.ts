@@ -4,11 +4,17 @@ import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 interface AuthResponse {
-  access_token: string;
+  succeeded: boolean;
+  data: {
+    access_token: string;
+    refresh_token: string;
+  };
+  message: string;
 }
 
 export class AuthHelper {
   private static accessToken: string;
+  private static refreshToken: string;
 
   static async setup(dataSource: DataSource) {
     const repo = dataSource.getRepository(UserEntity);
@@ -42,10 +48,15 @@ export class AuthHelper {
     }
 
     const data = (await response.json()) as AuthResponse;
-    this.accessToken = data.access_token;
+    this.accessToken = data.data.access_token;
+    this.refreshToken = data.data.refresh_token;
 
     if (!this.accessToken) {
       throw new Error('Falha ao autenticar. Nenhum token retornado');
+    }
+
+    if (!this.refreshToken) {
+      throw new Error('Falha ao autenticar. Nenhum refresh token retornado');
     }
   }
 
@@ -55,5 +66,13 @@ export class AuthHelper {
     }
 
     return { Authorization: `Bearer ${this.accessToken}` };
+  }
+
+  static RefreshToken() {
+    if (!this.refreshToken) {
+      throw new Error('Refresh token não encontrado');
+    }
+
+    return this.refreshToken;
   }
 }

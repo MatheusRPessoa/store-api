@@ -22,12 +22,15 @@ export class BaseResponseDto<T> {
  *   data: UserDto;
  * }
  */
-export abstract class BaseSuccessResponseDto {
+export abstract class BaseSuccessResponseDto<T = unknown> {
   @ApiProperty({ description: 'Indica sucesso da operação', example: true })
   succeeded: boolean;
 
   @ApiPropertyOptional({ description: 'Mensagem adicional' })
   message?: string;
+
+  @ApiProperty({ description: 'Body de resposta' })
+  data?: T;
 }
 
 /**
