@@ -184,4 +184,30 @@ export class UsersService {
       await queryRunner.release();
     }
   }
+
+  async findForAuth(id: number): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: {
+        ID: id,
+        STATUS: Not(BaseEntityStatusEnum.EXCLUIDO),
+      },
+    });
+
+    if (!user) {
+      this.logger.warn(`User ${id} not found for auth`);
+      throw new UnauthorizedException('Acesso negado');
+    }
+
+    return user;
+  }
+
+  async updateRefreshToken(
+    id: number,
+    refreshToken: string | null,
+  ): Promise<void> {
+    const user = await this.findForAuth(id);
+    user.REFRESH_TOKEN = refreshToken;
+    await this.userRepository.save(user);
+    this.logger.log(`Refresh token updated for user ${id}`);
+  }
 }
