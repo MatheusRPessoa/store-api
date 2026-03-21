@@ -9,7 +9,6 @@ import { DataSource, Repository } from 'typeorm';
 import { OrderEntity } from './entities/order.entity';
 import { OrderItemEntity } from './entities/order-item.entity';
 import { UsersService } from 'src/modules/users/users.service';
-import { ProductsService } from 'src/modules/products/products.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BaseEntityStatusEnum } from 'src/config/database/entities/enums/base-entity-status.enum';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -17,6 +16,12 @@ import { OrderDto } from './dto/order-response.dto';
 import { ORDER_EVENTS } from './events/order-event.constants';
 import { OrderCreatedEvent } from './events/order-created.event';
 import { plainToInstance } from 'class-transformer';
+import { ProductEntity } from '../products/entities/product.entity';
+import { PaymentEntity } from '../payment/entities/payment.entity';
+import { PaymentOrderResponseDto } from '../payment/dto/payment-response.dto';
+import { PayOrderDto } from '../payment/dto/pay-order.dto';
+import { PaymentStatusEnum } from '../payment/enums/payment-status.enum';
+import { OrderStatusEnum } from './enums/order-status.enum';
 
 @Injectable()
 export class OrdersService {
@@ -29,11 +34,10 @@ export class OrdersService {
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
 
-    @InjectRepository(OrderItemEntity)
-    private readonly orderItemRepository: Repository<OrderItemEntity>,
+    @InjectRepository(PaymentEntity)
+    private readonly paymentRepository: Repository<PaymentEntity>,
 
     private readonly userService: UsersService,
-    private readonly productService: ProductsService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -82,10 +86,13 @@ export class OrdersService {
       });
 
       for (const item of dto.ITEMS) {
-        const product = await this.productService.findOne(item.ID_PRODUTO);
+        const product = await manager.findOne(ProductEntity, {
+          where: { ID: item.ID_PRODUTO },
+          lock: { mode: 'pessimistic_write' },
+        });
 
         if (!product) {
-          throw new NotFoundException();
+          throw new NotFoundException('Produto não encontrado');
         }
 
         if (product.QUANTIDADE < item.QUANTIDADE) {
@@ -109,19 +116,17 @@ export class OrdersService {
 
       order.TOTAL = total;
 
-      const saved = await manager.save(order);
-
-      this.eventEmitter.emit(
-        ORDER_EVENTS.CREATED,
-        new OrderCreatedEvent(saved.ID, saved.TOTAL),
-      );
-
-      this.logger.log(
-        `Order ${saved.ID} created by ${user.NOME_USUARIO} - TOTAL ${saved.TOTAL}`,
-      );
-
-      return saved;
+      return await manager.save(order);
     });
+
+    this.eventEmitter.emit(
+      ORDER_EVENTS.CREATED,
+      new OrderCreatedEvent(savedOrder.ID, savedOrder.TOTAL),
+    );
+
+    this.logger.log(
+      `Order ${savedOrder.ID} created by ${user.NOME_USUARIO} - TOTAL ${savedOrder.TOTAL}`,
+    );
 
     return plainToInstance(OrderDto, savedOrder, {
       excludeExtraneousValues: true,
@@ -172,7 +177,14 @@ export class OrdersService {
       await manager.save(order);
 
       for (const item of order.ITEMS) {
-        const product = await this.productService.findOne(item.ID_PRODUTO);
+        const product = await manager.findOne(ProductEntity, {
+          where: { ID: item.ID_PRODUTO },
+          lock: { mode: 'pessimistic_write' },
+        });
+
+        if (!product) {
+          throw new NotFoundException('Produto não encontrado');
+        }
 
         product.QUANTIDADE += item.QUANTIDADE;
 
@@ -181,5 +193,44 @@ export class OrdersService {
     });
 
     this.logger.log(`Order ${id} canceled by ${user.NOME_USUARIO}`);
+  }
+
+  async pay(
+    orderId: number,
+    dto: PayOrderDto,
+  ): Promise<PaymentOrderResponseDto> {
+    const order = await this.orderRepository.findOne({
+      where: { ID: orderId },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Pedido #${orderId} não encontrado`);
+    }
+
+    if (order.STATUS_PEDIDO === OrderStatusEnum.PAGO) {
+      throw new BadRequestException(`Pedido #${orderId} já foi pago`);
+    }
+
+    const payment = this.paymentRepository.create({
+      ID_PEDIDO: orderId,
+      VALOR: order.TOTAL,
+      METODO: dto.method,
+      STATUS_PAGAMENTO: PaymentStatusEnum.APROVADO,
+    });
+
+    await this.paymentRepository.save(payment);
+
+    order.STATUS_PEDIDO = OrderStatusEnum.PAGO;
+    await this.orderRepository.save(order);
+
+    return {
+      orderId: orderId,
+      status: order.STATUS,
+      payment: {
+        status: payment.STATUS_PAGAMENTO,
+        method: payment.METODO,
+        amount: payment.VALOR,
+      },
+    };
   }
 }

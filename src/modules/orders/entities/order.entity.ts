@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { OrderItemEntity } from './order-item.entity';
+import { OrderStatusEnum } from '../enums/order-status.enum';
 
 @Entity('PEDIDOS')
 export class OrderEntity {
@@ -49,6 +50,14 @@ export class OrderEntity {
     default: BaseEntityStatusEnum.ATIVO,
   })
   STATUS: BaseEntityStatusEnum;
+
+  @Column({
+    name: 'STATUS_PEDIDO',
+    type: 'varchar',
+    enum: OrderStatusEnum,
+    default: OrderStatusEnum.PENDENTE,
+  })
+  STATUS_PEDIDO: OrderStatusEnum;
 
   @Column({
     name: 'ATUALIZADO_POR',

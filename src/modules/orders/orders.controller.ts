@@ -2,7 +2,10 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   UseGuards,
@@ -22,9 +25,11 @@ import {
   UnauthorizedResponseDto,
 } from 'src/common/dto/pagination/error-response.dto';
 import { BaseSuccessResponseDto } from 'src/common/dto/pagination/base-response.dto';
+import { PayOrderDto } from '../payment/dto/pay-order.dto';
+import { PaymentOrderResponseDto } from '../payment/dto/payment-response.dto';
 
 @ApiTags('Pedidos')
-@Controller('orders')
+@Controller('pedidos')
 export class OrdersController {
   constructor(private readonly orderService: OrdersService) {}
 
@@ -149,6 +154,21 @@ export class OrdersController {
     return {
       succeeded: true,
       message: 'Pedido cancelado com sucesso',
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/pay')
+  @HttpCode(HttpStatus.OK)
+  async pay(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: PayOrderDto,
+  ): Promise<BaseSuccessResponseDto<PaymentOrderResponseDto>> {
+    const data = await this.orderService.pay(id, dto);
+
+    return {
+      succeeded: true,
+      data,
     };
   }
 }
