@@ -20,7 +20,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ParseUsernamePipe } from 'src/common/pipes/parse-username.pipe';
 
 @ApiTags('Usuarios')
-@Controller('users')
+@Controller('usuarios')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
