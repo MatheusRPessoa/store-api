@@ -33,6 +33,14 @@ export class UserEntity {
   SENHA: string;
 
   @Column({
+    name: 'REFRESH_TOKEN',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
+  REFRESH_TOKEN: string | null;
+
+  @Column({
     name: 'STATUS',
     type: 'varchar',
     length: 20,
