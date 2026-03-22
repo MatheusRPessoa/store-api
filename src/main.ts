@@ -17,14 +17,28 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Minha API NestJS')
+    .setTitle('API Store')
     .setDescription('Documentação detalhada da API')
     .setVersion('1.0')
-    .addTag('users')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Insira o token JWT',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .addTag('Pedidos', 'Operações relacionadas a pedidos')
+    .addTag('Produtos', 'Operações relacionadas a produtos')
+    .addTag('Usuários', 'Operações relacionadas a usuários')
+    .addTag('Pagamentos', 'Operações relacionadas a pagamentos')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
 }
