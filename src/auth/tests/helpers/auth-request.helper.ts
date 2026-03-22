@@ -4,7 +4,7 @@ import { AuthHelper } from './auth.helper';
 const BASE_URL = 'http://localhost:3000';
 const AUTH_ENDPOINT = '/auth';
 
-interface AuthData {
+export interface AuthData {
   access_token: string;
   refresh_token: string;
 }
@@ -35,12 +35,13 @@ export async function refresh(
   const response = await fetch(`${BASE_URL}${AUTH_ENDPOINT}/refresh`, {
     method: 'POST',
     headers: {
-      'Contenty-Type': 'application/json',
-      ...(authenticate ? AuthHelper.getAuthHeader() : {}),
+      'Content-Type': 'application/json',
+      ...(authenticate ? AuthHelper.getRefreshHeader() : {}),
     },
   });
 
   const data = (await response.json()) as ApiResponse<AuthData>;
+  console.log('Resposta do refresh: ', data);
 
   return {
     status: response.status,
