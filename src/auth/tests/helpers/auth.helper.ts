@@ -68,9 +68,17 @@ export class AuthHelper {
     return { Authorization: `Bearer ${this.accessToken}` };
   }
 
-  static RefreshToken() {
+  static getRefreshHeader() {
     if (!this.refreshToken) {
       throw new Error('Refresh token não encontrado');
+    }
+
+    return { Authorization: `Bearer ${this.refreshToken}` };
+  }
+
+  static getRefreshToken() {
+    if (!this.refreshToken) {
+      throw new Error('Refresh token não disponível');
     }
 
     return this.refreshToken;
