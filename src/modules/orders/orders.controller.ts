@@ -10,7 +10,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -29,6 +34,7 @@ import { PayOrderDto } from '../payment/dto/pay-order.dto';
 import { PaymentOrderResponseDto } from '../payment/dto/payment-response.dto';
 
 @ApiTags('Pedidos')
+@ApiBearerAuth()
 @Controller('pedidos')
 export class OrdersController {
   constructor(private readonly orderService: OrdersService) {}
@@ -160,6 +166,25 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard)
   @Post(':id/pay')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Realizar pagamento',
+    description: 'Processa o pagamento com sucesso',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Pagamento processado com sucesso',
+    type: PaymentOrderResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Pedido inválido ou já pago',
+    type: PaymentOrderResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Não autorizado',
+    type: UnauthorizedResponseDto,
+  })
   async pay(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: PayOrderDto,
