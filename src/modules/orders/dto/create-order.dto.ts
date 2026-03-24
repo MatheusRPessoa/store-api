@@ -56,7 +56,7 @@ export class CreateOrderDto {
     ],
   })
   @IsArray({ message: 'Os itens devem ser um array' })
-  @ArrayMinSize(1, { message: 'O pedido deve conter pelo ,enos 1 item' })
+  @ArrayMinSize(1, { message: 'O pedido deve conter pelo menos um item' })
   @ValidateNested({ each: true })
   @Type(() => CreateOrderItemDto)
   ITEMS: CreateOrderItemDto[];
