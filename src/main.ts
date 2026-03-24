@@ -34,7 +34,6 @@ async function bootstrap() {
     .addTag('Pedidos', 'Operações relacionadas a pedidos')
     .addTag('Produtos', 'Operações relacionadas a produtos')
     .addTag('Usuários', 'Operações relacionadas a usuários')
-    .addTag('Pagamentos', 'Operações relacionadas a pagamentos')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
