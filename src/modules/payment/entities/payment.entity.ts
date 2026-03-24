@@ -7,7 +7,7 @@ import {
 import { PaymentStatusEnum } from '../enums/payment-status.enum';
 import { PaymentMethodEnum } from '../enums/payment-method.enum';
 
-@Entity('PAGAMENTO')
+@Entity('PAGAMENTOS')
 export class PaymentEntity {
   @PrimaryGeneratedColumn()
   ID: number;

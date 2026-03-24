@@ -77,6 +77,6 @@ export async function cleanupAll() {
     throw new Error('Data source não iniciado. Rode initTestDataSource antes.');
   }
 
-  await dataSource.query('DELETE FROM "PAGAMENTO"');
+  await dataSource.query('DELETE FROM "PAGAMENTOS"');
   await dataSource.query('DELETE FROM "PEDIDOS" WHERE "CRIADO_POR" = \'test\'');
 }
