@@ -173,6 +173,15 @@ export class OrdersController {
   @ApiResponse({
     status: 201,
     description: 'Pagamento processado com sucesso',
+    example: {
+      card: {
+        summary: 'Pagamento com cartão',
+        value: {
+          method: 'CARD',
+          amount: 199.9,
+        },
+      },
+    },
     type: PaymentOrderResponseDto,
   })
   @ApiResponse({
