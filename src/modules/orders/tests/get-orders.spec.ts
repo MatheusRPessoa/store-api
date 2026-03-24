@@ -18,6 +18,11 @@ describe('GET /orders', () => {
     await cleanupAll();
   });
 
+  afterAll(async () => {
+    await cleanupAll();
+    await AppDataSource.destroy();
+  });
+
   it('should return 200 and list orders', async () => {
     await OrderFactory.create();
 

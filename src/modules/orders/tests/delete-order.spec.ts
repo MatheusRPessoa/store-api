@@ -18,6 +18,11 @@ describe('PATH /orders/:id/cancel', () => {
     await cleanupAll();
   });
 
+  afterAll(async () => {
+    await cleanupAll();
+    await AppDataSource.destroy();
+  });
+
   describe('Success', () => {
     it('should return 200 and cancel the order', async () => {
       const order = await OrderFactory.create();

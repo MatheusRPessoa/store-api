@@ -17,6 +17,11 @@ describe('POST /orders', () => {
     await AuthHelper.setup(AppDataSource);
   });
 
+  afterAll(async () => {
+    await cleanupAll();
+    await AppDataSource.destroy();
+  });
+
   beforeEach(async () => {
     await cleanupAll();
 
@@ -38,8 +43,6 @@ describe('POST /orders', () => {
         },
       ]);
 
-      console.log('ORDER RESPONSE:', response.body);
-
       expect(response.status).toBe(201);
       expect(response.body.succeeded).toBe(true);
       expect(response.body.data?.TOTAL).toBeGreaterThan(0);
@@ -53,7 +56,9 @@ describe('POST /orders', () => {
 
       expect(response.status).toBe(400);
       expect(response.body.succeeded).toBe(false);
-      expect(response.body.message).toContain('pelo menos um item');
+      expect(response.body.message).toBe(
+        'O pedido deve conter pelo menos um item',
+      );
     });
 
     it('should be 404 when product does not exist', async () => {
