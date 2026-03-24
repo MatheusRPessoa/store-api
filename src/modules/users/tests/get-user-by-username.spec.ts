@@ -16,6 +16,7 @@ describe('GET /users/username/:username', () => {
 
   afterAll(async () => {
     await cleanupAll();
+    await AppDataSource.destroy();
   });
 
   beforeEach(async () => {

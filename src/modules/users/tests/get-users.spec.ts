@@ -24,6 +24,7 @@ describe('GET /users', () => {
 
   afterAll(async () => {
     await cleanupAll();
+    await AppDataSource.destroy();
   });
 
   it('should return all users', async () => {

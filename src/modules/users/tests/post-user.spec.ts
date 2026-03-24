@@ -15,14 +15,19 @@ describe('POST /users', () => {
 
   afterAll(async () => {
     await cleanupAll();
+    await AppDataSource.destroy();
   });
 
   describe('Success', () => {
     it('should return 201 when creating a user with valid data', async () => {
-      const response = await createUser({
-        username: 'test',
-        email: 'test@test.com',
-      });
+      const response = await createUser(
+        {
+          username: 'test',
+          email: 'test@test.com',
+        },
+        true,
+        '/users',
+      );
 
       expect(response.body.succeeded).toBe(true);
       expect(response.body.data?.NOME_USUARIO).toBe('test');
