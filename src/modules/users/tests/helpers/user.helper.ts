@@ -26,6 +26,7 @@ export async function createUser(
     email: string;
   }>,
   authenticated = true,
+  endpoint = USERS_ENDPOINT,
 ): Promise<{ status: number; ok: boolean; body: ApiResponse<UserData> }> {
   const payload = {
     username: overrides?.username ?? 'user-test',
@@ -33,7 +34,7 @@ export async function createUser(
     email: overrides?.email ?? 'test@email.com.br',
   };
 
-  const response = await fetch(`${BASE_URL}${USERS_ENDPOINT}`, {
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
