@@ -124,7 +124,12 @@ export async function cleanupAll() {
     );
   }
 
-  await dataSource.getRepository(OrderItemEntity).clear();
-  await dataSource.getRepository(OrderEntity).clear();
-  await dataSource.getRepository(ProductEntity).clear();
+  const orderItemRepo = dataSource.getRepository(OrderItemEntity);
+  const orderRepo = dataSource.getRepository(OrderEntity);
+  const productRepo = dataSource.getRepository(ProductEntity);
+
+  // ordem IMPORTANTE (FK)
+  await orderItemRepo.createQueryBuilder().delete().execute();
+  await orderRepo.createQueryBuilder().delete().execute();
+  await productRepo.createQueryBuilder().delete().execute();
 }
