@@ -35,7 +35,7 @@ import {
 import { SearchProductByNameDto } from './dto/search-product-by-name.dto';
 import { BaseSuccessResponseDto } from '../../common/dto/pagination/base-response.dto';
 
-@ApiTags('Mercadorias')
+@ApiTags('Produtos')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
