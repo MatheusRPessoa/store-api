@@ -16,6 +16,7 @@ describe('GET /products/name/:name', () => {
 
   afterAll(async () => {
     await cleanupAll();
+    await AppDataSource.destroy();
   });
 
   beforeEach(async () => {

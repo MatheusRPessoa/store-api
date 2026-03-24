@@ -31,6 +31,7 @@ describe('GET /products/:id', () => {
 
   afterAll(async () => {
     await cleanupAll();
+    await AppDataSource.destroy();
   });
 
   it('should return a user by id', async () => {

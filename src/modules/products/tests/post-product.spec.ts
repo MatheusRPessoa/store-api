@@ -15,6 +15,7 @@ describe('POST /products', () => {
 
   afterAll(async () => {
     await cleanupAll();
+    await AppDataSource.destroy();
   });
 
   describe('Success', () => {
