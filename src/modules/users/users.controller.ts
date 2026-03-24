@@ -19,11 +19,12 @@ import {
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ParseUsernamePipe } from 'src/common/pipes/parse-username.pipe';
 
-@ApiTags('Usuarios')
-@Controller('usuarios')
+@ApiTags('Usuários')
+@Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({
     summary: 'Criar usuário',
@@ -54,6 +55,35 @@ export class UsersController {
       succeeded: true,
       data: user,
       message: 'Usuário criado com sucesso',
+    };
+  }
+
+  @Post('register')
+  @ApiOperation({
+    summary: 'Registrar usuário',
+    description: 'Endpoint responsável para cadastro de usuário',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Usuário registrado com sucesso',
+    type: UserResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Dados inválidos',
+    type: BadRequestResponseDto,
+  })
+  async register(@Body() dto: CreateUserDto): Promise<UserResponseDto> {
+    const user = await this.userService.create(
+      dto.username,
+      dto.password,
+      dto.email,
+    );
+
+    return {
+      succeeded: true,
+      data: user,
+      message: 'Usuário registrado com sucesso',
     };
   }
 
